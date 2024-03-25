@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-default-admin-user
+      author: Sosunovych_Bohdan
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: "admin@example.com"
+              - column:
+                  name: password
+                  value: "$2a$10$eWXHAHh9XQWL3a51fJSrfuWjpK6A3T57dCons4GT49dn8j0P8ChZi"
+              - column:
+                  name: first_name
+                  value: "Admin"
+              - column:
+                  name: last_name
+                  value: "Admin"
+        - insert:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: (SELECT id FROM users WHERE email = 'admin@example.com')
+              - column:
+                  name: role_id
+                  valueComputed: (SELECT id FROM roles WHERE role_name = 'ROLE_MANAGER')

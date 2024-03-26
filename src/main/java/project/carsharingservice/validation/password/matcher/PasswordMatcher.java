@@ -1,8 +1,11 @@
 package project.carsharingservice.validation.password.matcher;
 
-import jakarta.validation.*;
-
-import java.lang.annotation.*;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 @Constraint(validatedBy = PasswordMatcherValidator.class)
 @Target(ElementType.TYPE)

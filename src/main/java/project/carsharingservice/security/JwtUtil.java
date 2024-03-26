@@ -1,14 +1,16 @@
 package project.carsharingservice.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.stereotype.*;
-
-import java.nio.charset.*;
-import java.security.*;
-import java.util.*;
-import java.util.function.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Date;
+import java.util.function.Function;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {

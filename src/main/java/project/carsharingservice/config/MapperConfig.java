@@ -1,6 +1,7 @@
 package project.carsharingservice.config;
 
-import org.mapstruct.*;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.NullValueCheckStrategy;
 
 @org.mapstruct.MapperConfig(
         componentModel = "spring",

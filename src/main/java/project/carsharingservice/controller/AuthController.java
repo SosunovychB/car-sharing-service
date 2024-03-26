@@ -1,14 +1,19 @@
 package project.carsharingservice.controller;
 
-import jakarta.validation.*;
-import lombok.*;
-import org.springframework.security.crypto.password.*;
-import org.springframework.web.bind.annotation.*;
-import project.carsharingservice.dto.login.*;
-import project.carsharingservice.dto.registration.*;
-import project.carsharingservice.security.*;
-import project.carsharingservice.service.*;
-import project.carsharingservice.validation.password.*;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import project.carsharingservice.dto.login.UserLoginRequestDto;
+import project.carsharingservice.dto.login.UserLoginResponseDto;
+import project.carsharingservice.dto.registration.UserRegistrationRequestDto;
+import project.carsharingservice.dto.registration.UserRegistrationResponseDto;
+import project.carsharingservice.exception.RegistrationException;
+import project.carsharingservice.security.AuthenticationService;
+import project.carsharingservice.service.UserService;
 
 @RestController
 @RequestMapping("/auth")
@@ -26,7 +31,8 @@ public class AuthController {
 
     @PostMapping("/registration")
     public UserRegistrationResponseDto registration(
-            @RequestBody @Valid UserRegistrationRequestDto requestDto) {
+            @RequestBody @Valid UserRegistrationRequestDto requestDto
+    ) throws RegistrationException {
         return userService.register(requestDto);
     }
 }

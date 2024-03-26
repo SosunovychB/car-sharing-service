@@ -1,10 +1,10 @@
 package project.carsharingservice.dto.registration;
 
-import jakarta.validation.constraints.*;
-import lombok.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 import project.carsharingservice.validation.email.Email;
-import project.carsharingservice.validation.password.*;
-import project.carsharingservice.validation.password.matcher.*;
+import project.carsharingservice.validation.password.Password;
+import project.carsharingservice.validation.password.matcher.PasswordMatcher;
 
 @Data
 @PasswordMatcher

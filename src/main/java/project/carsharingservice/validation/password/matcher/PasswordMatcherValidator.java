@@ -1,9 +1,9 @@
 package project.carsharingservice.validation.password.matcher;
 
-import jakarta.validation.*;
-import project.carsharingservice.dto.registration.*;
-
-import java.util.*;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import java.util.Objects;
+import project.carsharingservice.dto.registration.UserRegistrationRequestDto;
 
 public class PasswordMatcherValidator
         implements ConstraintValidator<PasswordMatcher, UserRegistrationRequestDto> {

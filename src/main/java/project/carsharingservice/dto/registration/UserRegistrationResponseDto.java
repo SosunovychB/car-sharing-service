@@ -1,6 +1,6 @@
 package project.carsharingservice.dto.registration;
 
-import lombok.*;
+import lombok.Data;
 
 @Data
 public class UserRegistrationResponseDto {

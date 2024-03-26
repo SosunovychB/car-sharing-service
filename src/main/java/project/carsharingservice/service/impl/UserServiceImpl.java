@@ -1,13 +1,17 @@
 package project.carsharingservice.service.impl;
 
-import lombok.*;
-import org.springframework.security.crypto.password.*;
-import org.springframework.stereotype.*;
-import project.carsharingservice.dto.registration.*;
-import project.carsharingservice.mapper.*;
-import project.carsharingservice.model.*;
-import project.carsharingservice.repository.*;
-import project.carsharingservice.service.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import project.carsharingservice.dto.registration.UserRegistrationRequestDto;
+import project.carsharingservice.dto.registration.UserRegistrationResponseDto;
+import project.carsharingservice.exception.RegistrationException;
+import project.carsharingservice.mapper.UserMapper;
+import project.carsharingservice.model.Role;
+import project.carsharingservice.model.User;
+import project.carsharingservice.repository.RoleRepository;
+import project.carsharingservice.repository.UserRepository;
+import project.carsharingservice.service.UserService;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +22,13 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserRegistrationResponseDto register(UserRegistrationRequestDto requestDto) {
+    public UserRegistrationResponseDto register(UserRegistrationRequestDto requestDto)
+            throws RegistrationException {
+        if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
+            throw new RegistrationException("User with email " + requestDto.getEmail()
+                    + " already exists");
+        }
+
         User user = new User();
         user.setEmail(requestDto.getEmail());
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));

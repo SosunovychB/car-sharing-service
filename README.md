@@ -10,37 +10,6 @@ sharing service administration has no way of knowing who returned the car on tim
 In this project, you will be addressing all these issues. Your task is to implement an online management system for car
 rentals. This system will streamline the work of the service administrators and greatly enhance the user experience.
 
-## Instructions
-
-1. Create a new Spring Boot project
-2. Create a new GitHub repo with `car-sharing-app` name (or any other you like)
-    - if you work in a team the repo MUST belong to the organization;
-    - configure `Branch protection rules` for the organization repository using the following tutorial:
-
-      <details>
-        <summary>Tutorial for branch protection rules</summary>
-
-      Go to the repository settings
-      STEP #1
-      ![Add your teammate](../car-sharing-service/description/first-step-for-branch-protection-rules.png)
-
-      STEP #2
-      ![Add your teammate](../car-sharing-service/description/second-step-for-branch-protection-rules.png)
-
-      Add the rule with only next settings
-      STEP #3
-      ![Add your teammate](../car-sharing-service/description/third-step-for-branch-protection-rules.png)
-
-      More information about all other settings at
-      the [link](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule)
-      </details>
-
-3. Connect a repo to a folder with your Spring Boot project (see the instructions on GitHub);
-4. Setup checkstyle plugin in your project
-5. Setup CI process to run `mvn clean verify` command by adding a `.github/workflows/ci.yml` file
-6. The `master` (or `main`) branch is a base for your feature PullRequests.
-7. PRs should be merged there after review
-
 ## How to develop a feature
 
 1. `Pull` the latest `master`.

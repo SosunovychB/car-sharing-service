@@ -3,8 +3,13 @@ package project.carsharingservice.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import project.carsharingservice.dto.registration.UserRegistrationRequestDto;
-import project.carsharingservice.dto.registration.UserRegistrationResponseDto;
+import org.springframework.transaction.annotation.Transactional;
+import project.carsharingservice.dto.auth.registration.UserRegistrationRequestDto;
+import project.carsharingservice.dto.auth.registration.UserRegistrationResponseDto;
+import project.carsharingservice.dto.user.GetUserInfoResponseDto;
+import project.carsharingservice.dto.user.UpdateRoleRequestDto;
+import project.carsharingservice.dto.user.UpdateUserInfoRequestDto;
+import project.carsharingservice.exception.EntityNotFoundException;
 import project.carsharingservice.exception.RegistrationException;
 import project.carsharingservice.mapper.UserMapper;
 import project.carsharingservice.model.Role;
@@ -37,6 +42,53 @@ public class UserServiceImpl implements UserService {
         user.getRoles().add(roleRepository.findByRoleName(Role.RoleName.ROLE_CUSTOMER));
 
         User savedUser = userRepository.save(user);
-        return userMapper.toResponseDto(savedUser);
+        return userMapper.entityToLoginResponseDto(savedUser);
+    }
+
+    @Override
+    public GetUserInfoResponseDto getUserInfo(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User with email "
+                        + email + " was not found"));
+        return userMapper.entityToUserInfoResponseDto(user);
+    }
+
+    @Override
+    @Transactional
+    public GetUserInfoResponseDto updateUserInfo(String email,
+                                                 UpdateUserInfoRequestDto requestDto) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User with email "
+                        + email + " was not found"));
+        User updatedUser = updateInfo(user, requestDto);
+        User savedUpdatedUser = userRepository.save(updatedUser);
+        return userMapper.entityToUserInfoResponseDto(savedUpdatedUser);
+    }
+
+    @Override
+    @Transactional
+    public void updateRole(Long userId,
+                           UpdateRoleRequestDto requestDto) {
+        if (userId == 1) {
+            throw new RuntimeException("Manager with id 1 can not update his role");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id "
+                        + userId + " was not found"));
+        Role role = roleRepository.findById(requestDto.roleId())
+                .orElseThrow(() -> new EntityNotFoundException("Role with id "
+                        + requestDto.roleId() + " was not found"));
+
+        user.getRoles().clear();
+        user.getRoles().add(role);
+        userRepository.save(user);
+    }
+
+    private User updateInfo(User user,
+                            UpdateUserInfoRequestDto requestDto) {
+        user.setFirstName(requestDto.getFirstName());
+        user.setLastName(requestDto.getLastName());
+        return user;
     }
 }

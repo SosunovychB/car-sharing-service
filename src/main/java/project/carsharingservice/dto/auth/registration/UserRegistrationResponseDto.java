@@ -1,4 +1,4 @@
-package project.carsharingservice.dto.registration;
+package project.carsharingservice.dto.auth.registration;
 
 import lombok.Data;
 

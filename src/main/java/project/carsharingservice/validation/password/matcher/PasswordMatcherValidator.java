@@ -3,7 +3,7 @@ package project.carsharingservice.validation.password.matcher;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.Objects;
-import project.carsharingservice.dto.registration.UserRegistrationRequestDto;
+import project.carsharingservice.dto.auth.registration.UserRegistrationRequestDto;
 
 public class PasswordMatcherValidator
         implements ConstraintValidator<PasswordMatcher, UserRegistrationRequestDto> {

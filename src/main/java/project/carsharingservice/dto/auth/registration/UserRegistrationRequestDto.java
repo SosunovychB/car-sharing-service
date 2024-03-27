@@ -1,4 +1,4 @@
-package project.carsharingservice.dto.registration;
+package project.carsharingservice.dto.auth.registration;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

@@ -9,7 +9,8 @@ import project.carsharingservice.dto.auth.registration.UserRegistrationResponseD
 import project.carsharingservice.dto.user.GetUserInfoResponseDto;
 import project.carsharingservice.dto.user.UpdateRoleRequestDto;
 import project.carsharingservice.dto.user.UpdateUserInfoRequestDto;
-import project.carsharingservice.exception.*;
+import project.carsharingservice.exception.EntityNotFoundException;
+import project.carsharingservice.exception.RegistrationException;
 import project.carsharingservice.mapper.UserMapper;
 import project.carsharingservice.model.Role;
 import project.carsharingservice.model.User;
@@ -54,10 +55,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public GetUserInfoResponseDto updateUserInfo(String email,
                                                  UpdateUserInfoRequestDto requestDto) {
-        if (requestDto == null) {
-            throw new EmptyRequestException("Your request can not be empty");
-        }
-
         User user = findUserByEmail(email);
         User updatedUser = userMapper.updateUserInfo(user, requestDto);
         User savedUpdatedUser = userRepository.save(updatedUser);
@@ -68,9 +65,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateRole(Long userId,
                            UpdateRoleRequestDto requestDto) {
-        if (userId == 1) {
-            throw new RuntimeException("Manager with id 1 can not update his role");
-        }
+        checkManagerId(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User with id "
@@ -86,6 +81,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long userId) {
+        checkManagerId(userId);
         userRepository.deleteById(userId);
     }
 
@@ -93,5 +89,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User with email "
                         + email + " was not found"));
+    }
+
+    private void checkManagerId(Long userId) {
+        if (userId == 1) {
+            throw new RuntimeException("Manager with id 1 can not do any updates with yourself.");
+        }
     }
 }

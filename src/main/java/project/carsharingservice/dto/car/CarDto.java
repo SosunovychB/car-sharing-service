@@ -1,10 +1,8 @@
 package project.carsharingservice.dto.car;
 
-import jakarta.persistence.*;
-import lombok.*;
-import project.carsharingservice.model.*;
-
-import java.math.*;
+import java.math.BigDecimal;
+import lombok.Data;
+import project.carsharingservice.model.Car;
 
 @Data
 public class CarDto {

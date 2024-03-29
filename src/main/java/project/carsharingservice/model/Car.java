@@ -1,11 +1,18 @@
 package project.carsharingservice.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.*;
-import org.hibernate.annotations.*;
-
-import java.math.*;
+import java.math.BigDecimal;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "cars")
@@ -19,7 +26,7 @@ public class Car {
     private Long id;
     @Column(name = "brand", nullable = false)
     private String brand;
-    @Column(name = "model", nullable = false)
+    @Column(name = "model", nullable = false, unique = true)
     private String model;
     @Column(name = "type", columnDefinition = "varchar", nullable = false)
     @Enumerated(value = EnumType.STRING)

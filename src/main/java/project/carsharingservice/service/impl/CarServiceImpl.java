@@ -1,18 +1,19 @@
 package project.carsharingservice.service.impl;
 
-import jakarta.transaction.*;
-import lombok.*;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.*;
-import project.carsharingservice.dto.car.*;
-import project.carsharingservice.exception.*;
-import project.carsharingservice.mapper.*;
-import project.carsharingservice.model.*;
-import project.carsharingservice.repository.*;
-import project.carsharingservice.service.*;
-
-import java.lang.reflect.*;
-import java.util.*;
+import jakarta.transaction.Transactional;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import project.carsharingservice.dto.car.AddNewCarRequestDto;
+import project.carsharingservice.dto.car.CarDto;
+import project.carsharingservice.dto.car.UpdateCarInfoRequestDto;
+import project.carsharingservice.exception.EntityNotFoundException;
+import project.carsharingservice.mapper.CarMapper;
+import project.carsharingservice.model.Car;
+import project.carsharingservice.repository.CarRepository;
+import project.carsharingservice.service.CarService;
 
 @Service
 @RequiredArgsConstructor

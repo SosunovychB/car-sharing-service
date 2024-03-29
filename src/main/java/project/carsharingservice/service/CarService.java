@@ -1,9 +1,10 @@
 package project.carsharingservice.service;
 
-import org.springframework.data.domain.*;
-import project.carsharingservice.dto.car.*;
-
-import java.util.*;
+import java.util.List;
+import org.springframework.data.domain.Pageable;
+import project.carsharingservice.dto.car.AddNewCarRequestDto;
+import project.carsharingservice.dto.car.CarDto;
+import project.carsharingservice.dto.car.UpdateCarInfoRequestDto;
 
 public interface CarService {
     List<CarDto> getAllCars(Pageable pageable);

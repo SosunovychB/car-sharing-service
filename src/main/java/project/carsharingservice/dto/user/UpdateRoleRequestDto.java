@@ -1,4 +1,11 @@
 package project.carsharingservice.dto.user;
 
-public record UpdateRoleRequestDto(long roleId) {
+import jakarta.validation.constraints.*;
+import lombok.*;
+
+@Data
+public class UpdateRoleRequestDto {
+    @NotNull
+    @Positive
+    private Long roleId;
 }

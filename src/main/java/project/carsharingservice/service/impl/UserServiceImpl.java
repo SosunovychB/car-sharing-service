@@ -9,8 +9,7 @@ import project.carsharingservice.dto.auth.registration.UserRegistrationResponseD
 import project.carsharingservice.dto.user.GetUserInfoResponseDto;
 import project.carsharingservice.dto.user.UpdateRoleRequestDto;
 import project.carsharingservice.dto.user.UpdateUserInfoRequestDto;
-import project.carsharingservice.exception.EntityNotFoundException;
-import project.carsharingservice.exception.RegistrationException;
+import project.carsharingservice.exception.*;
 import project.carsharingservice.mapper.UserMapper;
 import project.carsharingservice.model.Role;
 import project.carsharingservice.model.User;
@@ -47,9 +46,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GetUserInfoResponseDto getUserInfo(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User with email "
-                        + email + " was not found"));
+        User user = findUserByEmail(email);
         return userMapper.entityToUserInfoResponseDto(user);
     }
 
@@ -57,10 +54,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public GetUserInfoResponseDto updateUserInfo(String email,
                                                  UpdateUserInfoRequestDto requestDto) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User with email "
-                        + email + " was not found"));
-        User updatedUser = updateInfo(user, requestDto);
+        if (requestDto == null) {
+            throw new EmptyRequestException("Your request can not be empty");
+        }
+
+        User user = findUserByEmail(email);
+        User updatedUser = userMapper.updateUserInfo(user, requestDto);
         User savedUpdatedUser = userRepository.save(updatedUser);
         return userMapper.entityToUserInfoResponseDto(savedUpdatedUser);
     }
@@ -76,19 +75,23 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User with id "
                         + userId + " was not found"));
-        Role role = roleRepository.findById(requestDto.roleId())
+        Role role = roleRepository.findById(requestDto.getRoleId())
                 .orElseThrow(() -> new EntityNotFoundException("Role with id "
-                        + requestDto.roleId() + " was not found"));
+                        + requestDto.getRoleId() + " was not found"));
 
         user.getRoles().clear();
         user.getRoles().add(role);
         userRepository.save(user);
     }
 
-    private User updateInfo(User user,
-                            UpdateUserInfoRequestDto requestDto) {
-        user.setFirstName(requestDto.getFirstName());
-        user.setLastName(requestDto.getLastName());
-        return user;
+    @Override
+    public void deleteUserById(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    private User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User with email "
+                        + email + " was not found"));
     }
 }

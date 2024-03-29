@@ -77,7 +77,7 @@ rentals. This system will streamline the work of the service administrators and 
 ### Controllers
 
 1. Authentication Controller:
-    - POST: /register - register a new user
+    - POST: /register - register a new user 
     - POST: /login - get JWT tokens
 
 2. Users Controller: Managing authentication and user registration

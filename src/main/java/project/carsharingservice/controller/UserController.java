@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,10 +33,9 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    @ResponseStatus(HttpStatus.OK)
     public GetUserInfoResponseDto updateUserInfo(
             Authentication authentication,
-            @RequestBody @Valid UpdateUserInfoRequestDto requestDto) {
+            @RequestBody UpdateUserInfoRequestDto requestDto) {
         User user = (User) authentication.getPrincipal();
         return userService.updateUserInfo(user.getEmail(), requestDto);
     }
@@ -45,7 +45,14 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void updateRole(
             @PathVariable Long userId,
-            @RequestBody UpdateRoleRequestDto requestDto) {
+            @RequestBody @Valid UpdateRoleRequestDto requestDto) {
         userService.updateRole(userId, requestDto);
+    }
+
+    @DeleteMapping("/{userId}")
+    @PreAuthorize("hasRole('MANAGER')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable Long userId) {
+        userService.deleteUserById(userId);
     }
 }

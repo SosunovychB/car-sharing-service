@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changes/04-create-users_roles-table.yaml
   - include:
       file: db/changelog/changes/05-add-default-admin-user.yaml
+  - include:
+      file: db/changelog/changes/06-create-cars-table.yaml

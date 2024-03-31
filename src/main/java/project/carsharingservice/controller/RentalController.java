@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.carsharingservice.dto.rental.CreateRentalRequestDto;
-import project.carsharingservice.dto.rental.GetAllRentalsRequestDto;
 import project.carsharingservice.dto.rental.RentalDto;
 import project.carsharingservice.dto.rental.RentalDtoWithoutCarInfo;
 import project.carsharingservice.model.User;
@@ -25,10 +25,12 @@ public class RentalController {
     private final RentalService rentalService;
 
     @GetMapping
-    public List<RentalDtoWithoutCarInfo> getRentalsByUserId(GetAllRentalsRequestDto requestDto,
-                                                            Authentication authentication) {
+    public List<RentalDtoWithoutCarInfo> getRentalsByUserId(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Boolean isActive,
+            Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        return rentalService.getRentalsByUserId(requestDto, user);
+        return rentalService.getRentalsByUserId(userId, isActive, user);
     }
 
     @GetMapping("/{rentalId}")

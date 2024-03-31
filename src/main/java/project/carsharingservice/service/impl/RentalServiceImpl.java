@@ -6,7 +6,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.carsharingservice.dto.rental.CreateRentalRequestDto;
-import project.carsharingservice.dto.rental.GetAllRentalsRequestDto;
 import project.carsharingservice.dto.rental.RentalDto;
 import project.carsharingservice.dto.rental.RentalDtoWithoutCarInfo;
 import project.carsharingservice.exception.ClosedRentalException;
@@ -29,32 +28,36 @@ public class RentalServiceImpl implements RentalService {
     private final RentalMapper rentalMapper;
 
     @Override
-    public List<RentalDtoWithoutCarInfo> getRentalsByUserId(GetAllRentalsRequestDto requestDto,
+    public List<RentalDtoWithoutCarInfo> getRentalsByUserId(Long userId,
+                                                            Boolean isRentalActive,
                                                             User user) {
-        List<Rental> rentalDtoList = rentalRepository.findAllByUserId(requestDto.getUserId());
-        checkAccessToRentals(user, rentalDtoList);
+        if (userId == null || userId == 0) {
+            return rentalRepository.findAll().stream()
+                    .filter(rental -> checkAccessToRental(user, rental))
+                    .filter(rental -> isRentalActive == null
+                            || (isRentalActive && rental.getActualReturnDate() == null)
+                            || (!isRentalActive && rental.getActualReturnDate() != null)
+                    )
+                    .map(rentalMapper::entityRentalDtoWithoutCarInfo)
+                    .toList();
+        } else {
+            List<Rental> rentalList = rentalRepository.findAllByUserId(userId);
+            checkAccessToRentals(user, rentalList);
 
-        if (requestDto.getIsActive() == null) {
-            return rentalDtoList.stream()
+            return rentalList.stream()
+                    .filter(rental -> isRentalActive == null
+                            || (isRentalActive && rental.getActualReturnDate() == null)
+                            || (!isRentalActive && rental.getActualReturnDate() != null))
                     .map(rentalMapper::entityRentalDtoWithoutCarInfo)
                     .toList();
         }
-        return requestDto.getIsActive()
-                ? rentalDtoList.stream()
-                .filter(rental -> rental.getActualReturnDate() == null)
-                .map(rentalMapper::entityRentalDtoWithoutCarInfo)
-                .toList()
-                : rentalDtoList.stream()
-                .filter(rental -> rental.getActualReturnDate() != null)
-                .map(rentalMapper::entityRentalDtoWithoutCarInfo)
-                .toList();
     }
 
     @Override
     public RentalDto getRentalById(Long rentalId,
                                    User user) {
         Rental rental = rentalRepository.findById(rentalId).orElseThrow(
-                () -> new EntityNotFoundException("Rental with id " + rentalId + " was not found.")
+                () -> new EntityNotFoundException("Rental with id " + rentalId + " was not found")
         );
         checkAccessToRentals(user, List.of(rental));
 
@@ -81,24 +84,30 @@ public class RentalServiceImpl implements RentalService {
         Rental rental = findRentalByIdAndUserId(rentalId, userId);
         checkIfRentalNotClosed(rental);
 
-        rental.setReturnDate(LocalDate.now());
+        rental.setActualReturnDate(LocalDate.now());
         increaseCarQuantity(rental);
 
         Rental updatedRental = rentalRepository.save(rental);
         return rentalMapper.entityToRentalDto(updatedRental);
     }
 
+    private boolean checkAccessToRental(User user, Rental rental) {
+        return user.getRoles().stream()
+                .anyMatch(role -> role.getRoleName() == Role.RoleName.ROLE_MANAGER)
+                || rental.getUser().getId().equals(user.getId());
+    }
+
     private void checkAccessToRentals(User user, List<Rental> rentals) {
-        if (user.getRoles().contains(Role.RoleName.ROLE_MANAGER)) {
-            return;
-        }
+        if (user.getRoles().stream()
+                .noneMatch(role -> role.getRoleName() == Role.RoleName.ROLE_MANAGER)) {
+            List<Long> userRentalIds = rentals.stream()
+                    .map(rental -> rental.getUser().getId())
+                    .toList();
 
-        List<Long> userRentalIds = rentals.stream()
-                .map(Rental::getId)
-                .toList();
-
-        if (!userRentalIds.contains(user.getId())) {
-            throw new UnauthorizedAccessException("You do not have access to specified rentals.");
+            if (!userRentalIds.contains(user.getId())) {
+                throw new UnauthorizedAccessException(
+                        "You do not have access to specified rental(s)");
+            }
         }
     }
 
@@ -112,17 +121,17 @@ public class RentalServiceImpl implements RentalService {
     private void checkIfRentalNotClosed(Rental rental) {
         if (rental.getActualReturnDate() != null) {
             throw new ClosedRentalException("Rental with id "
-                    + rental.getId() + " was already closed.");
+                    + rental.getId() + " was already closed");
         }
     }
 
     private void setUpCarForNewRental(Rental newRental, Long carId) {
         Car car = carRepository.findById(carId).orElseThrow(
-                () -> new EntityNotFoundException("Car with id " + carId + " was not found.")
+                () -> new EntityNotFoundException("Car with id " + carId + " was not found")
         );
 
         if (car.getInventory() <= 0) {
-            throw new EntityNotFoundException("Sorry, this car is not available now.");
+            throw new EntityNotFoundException("Sorry, this car is not available now");
         } else {
             car.setInventory(car.getInventory() - 1);
         }

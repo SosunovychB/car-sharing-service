@@ -2,13 +2,14 @@ package project.carsharingservice.service;
 
 import java.util.List;
 import project.carsharingservice.dto.rental.CreateRentalRequestDto;
-import project.carsharingservice.dto.rental.GetAllRentalsRequestDto;
 import project.carsharingservice.dto.rental.RentalDto;
 import project.carsharingservice.dto.rental.RentalDtoWithoutCarInfo;
 import project.carsharingservice.model.User;
 
 public interface RentalService {
-    List<RentalDtoWithoutCarInfo> getRentalsByUserId(GetAllRentalsRequestDto requestDto, User user);
+    List<RentalDtoWithoutCarInfo> getRentalsByUserId(Long userId,
+                                                     Boolean isRentalActive,
+                                                     User user);
 
     RentalDto getRentalById(Long rentalId, User user);
 

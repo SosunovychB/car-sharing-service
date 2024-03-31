@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
     private void checkManagerId(Long userId) {
         if (userId == 1) {
-            throw new RuntimeException("Manager with id 1 can not do any updates with yourself.");
+            throw new RuntimeException("Manager with id 1 can not do any updates with yourself");
         }
     }
 }

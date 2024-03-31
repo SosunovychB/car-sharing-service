@@ -4,10 +4,12 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import project.carsharingservice.config.MapperConfig;
 import project.carsharingservice.dto.car.AddNewCarRequestDto;
 import project.carsharingservice.dto.car.CarDto;
+import project.carsharingservice.dto.car.RentedCarDto;
 import project.carsharingservice.dto.car.UpdateCarInfoRequestDto;
 import project.carsharingservice.model.Car;
 
@@ -43,4 +45,7 @@ public interface CarMapper {
             car.setType(Car.Type.findByValue(typeValue));
         }
     }
+
+    @Named(value = "entityToRentedCarDto")
+    RentedCarDto entityToRentedCarDto(Car car);
 }

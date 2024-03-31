@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/changes/05-add-default-admin-user.yaml
   - include:
       file: db/changelog/changes/06-create-cars-table.yaml
+  - include:
+      file: db/changelog/changes/07-create-rentals-table.yaml

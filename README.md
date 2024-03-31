@@ -2,6 +2,7 @@
 
 There is a car sharing service in your city, where you can rent cars and pay for your usage using cash, depending on the
 duration of your rental.
+
 The problem is, the system for tracking cars, rentals, users, and payments in the car sharing service is outdated -
 everything is managed manually and all records are kept on paper. There is no way to check the availability of specific
 cars in the service. Additionally, you can only make payments with cash; there is no support for credit cards. The car
@@ -9,21 +10,6 @@ sharing service administration has no way of knowing who returned the car on tim
 
 In this project, you will be addressing all these issues. Your task is to implement an online management system for car
 rentals. This system will streamline the work of the service administrators and greatly enhance the user experience.
-
-## How to develop a feature
-
-1. `Pull` the latest `master`.
-2. Create a `your-feature-name` branch and `push` it to GitHub.
-3. Open a Pull Request (`PR`) from your branch to the `master` (`main`).
-4. Discuss branches and commits naming practices. Your branch, PR, and commit names should be consistent across the
-   team. Example of PR names:
-    - [DB]: prefix for liquibase scripts
-    - [API] for scripts with api changes
-5. Do not use forks, work in single repo altogether!
-6. Write your code, save it and push it to GitHub.
-7. Ask your teammate to review and approve if everything is OK.
-8. If some fixes are required discuss the comments and repeat steps 5-7.
-9. Mentors will review your codebase everyday, but not PRs.
 
 ## App
 
@@ -44,7 +30,7 @@ rentals. This system will streamline the work of the service administrators and 
 
 ### Architecture
 
-![architecture](../car-sharing-service/description/architecture.png)
+![architecture.png](architecture.png)
 
 ### Models
 
@@ -110,24 +96,14 @@ rentals. This system will streamline the work of the service administrators and 
     - Other services interact with it to send notifications to car sharing service administrators.
     - Uses Telegram API, Telegram Chats, and Bots.
 
-## Coding
-
-- Add checkstyle plugin.
-- Separate PR to the `main` branch for each task is required.
-- 60%+ of the custom code should be covered with tests.
-- Make sure to name your commits & branches meaningfully.
-- Do not use forks, work in single repo altogether.
-
 ## Tasks
 
 ### Infrastructure
 
-- Create Trello board for task management
-- Create a GitHub organization
-- Create a project
-- Add maven checkstyle plugin
-- Configure CI process
-- Add liquibase support
++ Create a project
++ Add maven checkstyle plugin
++ Configure CI process
++ Add liquibase support
 - Add health check controller
 - Add Docker and docker-compose support
 - Use .env file in the docker with all sensitive information and push only .env.sample with a skeleton data from .env

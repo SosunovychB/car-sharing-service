@@ -19,10 +19,12 @@ import project.carsharingservice.model.User;
 import project.carsharingservice.repository.CarRepository;
 import project.carsharingservice.repository.RentalRepository;
 import project.carsharingservice.service.RentalService;
+import project.carsharingservice.service.notification.bot.NotificationService;
 
 @Service
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalService {
+    private final NotificationService notificationService;
     private final RentalRepository rentalRepository;
     private final CarRepository carRepository;
     private final RentalMapper rentalMapper;
@@ -75,6 +77,7 @@ public class RentalServiceImpl implements RentalService {
         setUpCarForNewRental(newRental, requestDto.getCarId());
 
         Rental savedNewRental = rentalRepository.save(newRental);
+        notificationService.sendNewRentalNotification(savedNewRental);
         return rentalMapper.entityToRentalDto(savedNewRental);
     }
 

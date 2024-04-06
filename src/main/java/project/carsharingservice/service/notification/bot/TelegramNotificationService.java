@@ -24,19 +24,17 @@ import project.carsharingservice.repository.RentalRepository;
 public class TelegramNotificationService
         extends TelegramLongPollingBot
         implements NotificationService {
+    private static final long CHAT_ID = -1002073613272L;
     private final RentalRepository rentalRepository;
     private final RentalMapper rentalMapper;
     private final CarMapper carMapper;
-    private final long chatId;
 
     @Autowired
     public TelegramNotificationService(@Value("${bot.token}") String botToken,
-                                       @Value("${chat.id}") long chatId,
                                        RentalRepository rentalRepository,
                                        RentalMapper rentalMapper,
                                        CarMapper carMapper) {
         super(botToken);
-        this.chatId = chatId;
         this.rentalRepository = rentalRepository;
         this.rentalMapper = rentalMapper;
         this.carMapper = carMapper;
@@ -46,7 +44,7 @@ public class TelegramNotificationService
     public void onUpdateReceived(Update update) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setText("You can only read info. Please wait for updates.");
-        sendMessage.setChatId(chatId);
+        sendMessage.setChatId(CHAT_ID);
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -65,7 +63,7 @@ public class TelegramNotificationService
         sendMessage.setText("New rental " + rental.getId()
                 + " was created by user with id " + rental.getUser().getId()
                 + ". Rented car is " + carMapper.entityToCarDto(rental.getCar()));
-        sendMessage.setChatId(chatId);
+        sendMessage.setChatId(CHAT_ID);
         sendCreatedMessage(sendMessage);
     }
 
@@ -82,7 +80,15 @@ public class TelegramNotificationService
         SendMessage sendMessage = new SendMessage();
         String message = list.isEmpty() ? "No rentals overdue today!" : "Rentals overdue: " + list;
         sendMessage.setText(message);
-        sendMessage.setChatId(chatId);
+        sendMessage.setChatId(CHAT_ID);
+        sendCreatedMessage(sendMessage);
+    }
+
+    @Override
+    public void sendSuccessfulPaymentNotification(long rentalId) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setText("Rental with id " + rentalId + " was successfully paid");
+        sendMessage.setChatId(CHAT_ID);
         sendCreatedMessage(sendMessage);
     }
 

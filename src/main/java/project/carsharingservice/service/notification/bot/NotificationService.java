@@ -6,4 +6,6 @@ public interface NotificationService {
     void sendNewRentalNotification(Rental rental);
 
     void sendOverdueRentalsNotification();
+
+    void sendSuccessfulPaymentNotification(long rentalId);
 }

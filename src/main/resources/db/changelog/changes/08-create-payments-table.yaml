@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-payments-table
+      author: Sosunovych_Bohdan
+      changes:
+        - createTable:
+            tableName: payments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: rental_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: payment_status
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: payment_type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: session_url
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: session_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_price
+                  type: decimal
+                  constraints:
+                    nullable: false

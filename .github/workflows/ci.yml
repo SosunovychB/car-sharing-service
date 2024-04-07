@@ -18,3 +18,5 @@ jobs:
         run: mvn --batch-mode --update-snapshots verify
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}

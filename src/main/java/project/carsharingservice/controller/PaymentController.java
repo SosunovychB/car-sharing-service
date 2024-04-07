@@ -25,8 +25,10 @@ public class PaymentController {
 
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
-    public PaymentDto createPaymentSession(@RequestBody @Valid MakePaymentRequestDto requestDto) {
-        return paymentService.createPaymentSession(requestDto);
+    public PaymentDto createPaymentSession(@RequestBody @Valid MakePaymentRequestDto requestDto,
+                                           Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return paymentService.createPaymentSession(requestDto, user);
     }
 
     @GetMapping("/")
@@ -36,17 +38,17 @@ public class PaymentController {
         return paymentService.getAllPaymentsByUserId(userId, user);
     }
 
-    @GetMapping("/success/{rentalId}")
+    @GetMapping("/success/{paymentId}")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public String paymentSuccessRedirect(@PathVariable long rentalId) {
-        paymentService.verifySuccessfulPayment(rentalId);
+    public String paymentSuccessRedirect(@PathVariable long paymentId) {
+        paymentService.verifySuccessfulPayment(paymentId);
         return "some-success-page";
     }
 
-    @GetMapping("/cancel/{rentalId}")
+    @GetMapping("/cancel/{paymentId}")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public String paymentCancelRedirect(@PathVariable long rentalId) {
-        return "Payment for rental with id " + rentalId
-                + " was canceled, but you can finish this payment for 24 hours.";
+    public String paymentCancelRedirect(@PathVariable long paymentId) {
+        return "Payment with id " + paymentId
+                + " was canceled, but you can finish it for 24 hours.";
     }
 }

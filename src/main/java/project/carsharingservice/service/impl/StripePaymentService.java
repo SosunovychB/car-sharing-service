@@ -1,5 +1,10 @@
 package project.carsharingservice.service.impl;
 
+import static project.carsharingservice.model.Payment.PaymentStatus.PAID;
+import static project.carsharingservice.model.Payment.PaymentStatus.PENDING;
+import static project.carsharingservice.model.Payment.PaymentType.FINE;
+import static project.carsharingservice.model.Payment.PaymentType.PAYMENT;
+
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -12,12 +17,16 @@ import java.net.URL;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import project.carsharingservice.dto.payment.MakePaymentRequestDto;
 import project.carsharingservice.dto.payment.PaymentDto;
 import project.carsharingservice.exception.CreateSessionException;
 import project.carsharingservice.exception.EntityNotFoundException;
+import project.carsharingservice.exception.PaidPaymentException;
 import project.carsharingservice.exception.RentalReturnException;
 import project.carsharingservice.exception.UnauthorizedAccessException;
 import project.carsharingservice.mapper.PaymentMapper;
@@ -42,17 +51,24 @@ public class StripePaymentService implements PaymentService {
     private final RentalRepository rentalRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
+    @Value("${stripe.secret.key}")
+    private String stripeApiKey;
 
     @Override
     @Transactional
-    public PaymentDto createPaymentSession(MakePaymentRequestDto requestDto) {
+    public PaymentDto createPaymentSession(MakePaymentRequestDto requestDto, User user) {
         Rental rental = getRentalById(requestDto.getRentalId());
-        BigDecimal totalPrice = calculateTotalPrice(rental);
-        Session session = createSession(totalPrice, rental.getId());
+        checkIfRentalIsPaid(rental);
+        checkIfUserIsRentalOwner(rental, user);
 
-        Payment payment = createPayment(rental, totalPrice, session);
-        paymentRepository.save(payment);
-        return paymentMapper.entityToPaymentDto(payment);
+        Payment newPayment = paymentRepository.save(createModelPayment());
+
+        BigDecimal totalPrice = calculateTotalPrice(rental);
+        Session session = createSession(totalPrice, newPayment, rental);
+
+        newPayment = updateActualInfoForPayment(newPayment, rental, totalPrice, session);
+        paymentRepository.save(newPayment);
+        return paymentMapper.entityToPaymentDto(newPayment);
     }
 
     @Override
@@ -67,15 +83,15 @@ public class StripePaymentService implements PaymentService {
 
     @Override
     @Transactional
-    public void verifySuccessfulPayment(long rentalId) {
-        Payment payment = paymentRepository.findByRentalId(rentalId).orElseThrow(
+    public void verifySuccessfulPayment(long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(
                 () -> new EntityNotFoundException("Ooops... Something went wrong... "
-                        + "Payment for rental with id " + rentalId + " was not found")
+                        + "Payment with id " + paymentId + " was not found")
         );
-        payment.setPaymentStatus(Payment.PaymentStatus.PAID);
+        payment.setPaymentStatus(PAID);
         paymentRepository.save(payment);
 
-        notificationService.sendSuccessfulPaymentNotification(rentalId);
+        notificationService.sendSuccessfulPaymentNotification(payment.getRental().getId());
     }
 
     private Rental getRentalById(long rentalId) {
@@ -84,11 +100,30 @@ public class StripePaymentService implements PaymentService {
         );
     }
 
+    private void checkIfRentalIsPaid(Rental rental) {
+        Optional<Payment> paymentOptional = paymentRepository
+                .findSuccessfulPaymentByRentalId(rental.getId());
+        if (paymentOptional.isPresent()) {
+            throw new PaidPaymentException("Payment for rental with id " + rental.getId()
+                    + " was already done");
+        }
+    }
+
+    private void checkIfUserIsRentalOwner(Rental rental, User user) {
+        if (!Objects.equals(rental.getUser().getId(), user.getId())) {
+            throw new EntityNotFoundException("User with id " + user.getId()
+                    + " does not have rental with id " + rental.getId());
+        }
+    }
+
     private BigDecimal calculateTotalPrice(Rental rental) {
         checkIfRentalClosed(rental);
 
         long numberOfRentalDays = ChronoUnit.DAYS.between(
                 rental.getRentalDate(), rental.getActualReturnDate());
+        if (numberOfRentalDays == 0) {
+            numberOfRentalDays = 1;
+        }
         BigDecimal dailyFee = rental.getCar().getDailyFee();
 
         return isRentalReturnedLate(rental)
@@ -104,12 +139,32 @@ public class StripePaymentService implements PaymentService {
     private void checkIfRentalClosed(Rental rental) {
         if (rental.getActualReturnDate() == null) {
             throw new RentalReturnException("Before payment for rental with id "
-                    + rental.getId() + " you must return car");
+                    + rental.getId() + " you must return the car");
         }
     }
 
-    private Session createSession(BigDecimal totalPrice, long rentalId) {
-        Stripe.apiKey = System.getenv().get("STRIPE_API_KEY");
+    private Payment createModelPayment() {
+        Rental rental = new Rental();
+        rental.setId(0L);
+
+        Payment payment = new Payment();
+        payment.setRental(rental);
+        payment.setPaymentStatus(PENDING);
+        payment.setPaymentType(PAYMENT);
+        payment.setSessionId("id");
+        payment.setTotalPrice(new BigDecimal(0));
+        try {
+            payment.setSessionUrl(new URL("http://default.url"));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Can not create default url", e);
+        }
+        return payment;
+    }
+
+    private Session createSession(BigDecimal totalPrice,
+                                  Payment payment,
+                                  Rental rental) {
+        Stripe.apiKey = stripeApiKey;
         final long expirationTime =
                 Instant.now().plusSeconds(24 * 60 * 60).getEpochSecond();
 
@@ -117,14 +172,29 @@ public class StripePaymentService implements PaymentService {
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
                         .setSuccessUrl(String.valueOf(
-                                URI.create(LOCAL_DOMAIN + SUCCESSFUL_PAYMENT_PATH + rentalId)))
+                                URI.create(LOCAL_DOMAIN + SUCCESSFUL_PAYMENT_PATH
+                                        + payment.getId())))
                         .setCancelUrl(String.valueOf(
-                                URI.create(LOCAL_DOMAIN + CANCELED_PAYMENT_PATH + rentalId)))
+                                URI.create(LOCAL_DOMAIN + CANCELED_PAYMENT_PATH
+                                        + payment.getId())))
                         .addLineItem(
                                 SessionCreateParams.LineItem.builder()
                                         .setQuantity(1L)
-                                        .setPrice(String.valueOf(totalPrice))
-                                        .setCurrency(CURRENCY)
+                                        .setPriceData(
+                                                SessionCreateParams.LineItem.PriceData.builder()
+                                                        .setProductData(
+                                                                SessionCreateParams.LineItem
+                                                                        .PriceData
+                                                                        .ProductData.builder()
+                                                                        .setName("Payment for "
+                                                                                + "rental "
+                                                                                + rental)
+                                                                        .build()
+                                                        )
+                                                        .setUnitAmount(
+                                                                totalPrice.longValue() * 100L)
+                                                        .setCurrency(CURRENCY)
+                                                        .build())
                                         .build())
                         .setExpiresAt(expirationTime)
                         .build();
@@ -138,12 +208,12 @@ public class StripePaymentService implements PaymentService {
         return session;
     }
 
-    private Payment createPayment(Rental rental, BigDecimal totalPrice, Session session) {
-        Payment payment = new Payment();
+    private Payment updateActualInfoForPayment(Payment payment,
+                                               Rental rental,
+                                               BigDecimal totalPrice,
+                                               Session session) {
         payment.setRental(rental);
-        payment.setPaymentStatus(Payment.PaymentStatus.PENDING);
-        payment.setPaymentType(isRentalReturnedLate(rental)
-                ? Payment.PaymentType.FINE : Payment.PaymentType.PAYMENT);
+        payment.setPaymentType(isRentalReturnedLate(rental) ? FINE : PAYMENT);
         payment.setSessionId(session.getId());
         payment.setTotalPrice(totalPrice);
         try {

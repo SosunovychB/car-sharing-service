@@ -9,8 +9,8 @@ import project.carsharingservice.model.Payment;
 public class PaymentDto {
     private long id;
     private long rentalId;
-    private Payment.PaymentStatus status;
-    private Payment.PaymentType type;
+    private Payment.PaymentStatus paymentStatus;
+    private Payment.PaymentType paymentType;
     private URL sessionUrl;
     private String sessionId;
     private BigDecimal totalPrice;

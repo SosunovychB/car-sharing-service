@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
@@ -32,7 +33,8 @@ public class Payment {
     @Column(name = "payment_type", columnDefinition = "varchar", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private PaymentType paymentType;
-    @Column(name = "session_url", nullable = false)
+    @Column(name = "session_url", columnDefinition = "text", nullable = false)
+    @Lob
     private URL sessionUrl;
     @Column(name = "session_id", nullable = false)
     private String sessionId;

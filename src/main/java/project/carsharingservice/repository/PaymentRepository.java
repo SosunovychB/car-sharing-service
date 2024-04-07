@@ -11,5 +11,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             + "WHERE u.id = :userId")
     List<Payment> findAllByUserId(long userId);
 
-    Optional<Payment> findByRentalId(long rentalId);
+    @Query("FROM Payment p LEFT JOIN FETCH p.rental r "
+            + "WHERE p.paymentStatus = 'PAID' AND r.id = :rentalId")
+    Optional<Payment> findSuccessfulPaymentByRentalId(long rentalId);
 }

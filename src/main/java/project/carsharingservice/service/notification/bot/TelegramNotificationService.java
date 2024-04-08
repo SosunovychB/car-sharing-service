@@ -30,7 +30,7 @@ public class TelegramNotificationService
     private final CarMapper carMapper;
 
     @Autowired
-    public TelegramNotificationService(@Value("${bot.token}") String botToken,
+    public TelegramNotificationService(@Value("${BOT_TOKEN}") String botToken,
                                        RentalRepository rentalRepository,
                                        RentalMapper rentalMapper,
                                        CarMapper carMapper) {

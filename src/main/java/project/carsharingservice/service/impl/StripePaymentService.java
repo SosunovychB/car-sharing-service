@@ -51,7 +51,7 @@ public class StripePaymentService implements PaymentService {
     private final RentalRepository rentalRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
-    @Value("${stripe.secret.key}")
+    @Value("${STRIPE_SECRET_KEY}")
     private String stripeApiKey;
 
     @Override

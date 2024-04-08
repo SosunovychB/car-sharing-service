@@ -104,9 +104,8 @@ rentals. This system will streamline the work of the service administrators and 
 + Add maven checkstyle plugin
 + Configure CI process
 + Add liquibase support
-- Add health check controller
-- Add Docker and docker-compose support
-- Use .env file in the docker with all sensitive information and push only .env.sample with a skeleton data from .env
++ Add Docker and docker-compose support
++ Use .env file in the docker with all sensitive information and push only .env.sample with a skeleton data from .env
   file.
 - Add swagger documentation to project
 - Fulfill README.md after project finalization

@@ -1,5 +1,8 @@
 package project.carsharingservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,8 @@ import project.carsharingservice.dto.user.UpdateUserInfoRequestDto;
 import project.carsharingservice.model.User;
 import project.carsharingservice.service.UserService;
 
+@Tag(name = "User management", description = "Endpoints for managing users")
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -27,12 +32,16 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
+    @Operation(summary = "Get user info about yourself",
+            description = "Get user info about yourself")
     public GetUserInfoResponseDto getUserInfo(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         return userService.getUserInfo(user.getEmail());
     }
 
     @PutMapping("/me")
+    @Operation(summary = "Update user info about yourself",
+            description = "Update user info about yourself")
     public GetUserInfoResponseDto updateUserInfo(
             Authentication authentication,
             @RequestBody UpdateUserInfoRequestDto requestDto) {
@@ -42,6 +51,8 @@ public class UserController {
 
     @PatchMapping("/{userId}/role")
     @PreAuthorize("hasRole('MANAGER')")
+    @Operation(summary = "Update an user role",
+            description = "Update an user role")
     @ResponseStatus(HttpStatus.OK)
     public void updateRole(
             @PathVariable Long userId,
@@ -51,6 +62,8 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasRole('MANAGER')")
+    @Operation(summary = "Delete an user by id",
+            description = "Delete an user by id")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long userId) {
         userService.deleteUserById(userId);

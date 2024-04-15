@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import project.carsharingservice.dto.payment.MakePaymentRequestDto;
 import project.carsharingservice.dto.payment.PaymentDto;
@@ -51,8 +50,6 @@ public class StripePaymentService implements PaymentService {
     private final RentalRepository rentalRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
-    @Value("${STRIPE_SECRET_KEY}")
-    private String stripeApiKey;
 
     @Override
     @Transactional
@@ -66,7 +63,7 @@ public class StripePaymentService implements PaymentService {
         BigDecimal totalPrice = calculateTotalPrice(rental);
         Session session = createSession(totalPrice, newPayment, rental);
 
-        newPayment = updateActualInfoForPayment(newPayment, rental, totalPrice, session);
+        updateActualInfoForPayment(newPayment, rental, totalPrice, session);
         paymentRepository.save(newPayment);
         return paymentMapper.entityToPaymentDto(newPayment);
     }
@@ -164,7 +161,8 @@ public class StripePaymentService implements PaymentService {
     private Session createSession(BigDecimal totalPrice,
                                   Payment payment,
                                   Rental rental) {
-        Stripe.apiKey = stripeApiKey;
+        Stripe.apiKey = "sk_test_51P1aBM04jfql3zF3R1rHSqGC4p0U5Lny8EKbEiKu8CNUb"
+                    + "5i0ZAVRcC0LbhOG9jI8GhvAWHhdWl9BHS1RKDS2kM5W00pltajtgF";
         final long expirationTime =
                 Instant.now().plusSeconds(24 * 60 * 60).getEpochSecond();
 

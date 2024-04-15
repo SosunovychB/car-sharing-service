@@ -11,11 +11,13 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Entity
 @Table(name = "rentals")
 @Getter
 @Setter
+@Accessors(chain = true)
 public class Rental {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

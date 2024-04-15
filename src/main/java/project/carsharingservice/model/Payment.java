@@ -14,11 +14,13 @@ import java.math.BigDecimal;
 import java.net.URL;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Entity
 @Table(name = "payments")
 @Getter
 @Setter
+@Accessors(chain = true)
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

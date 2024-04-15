@@ -6,9 +6,11 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
 @NotNull
+@Accessors(chain = true)
 public class AddNewCarRequestDto {
     @NotBlank
     private String brand;

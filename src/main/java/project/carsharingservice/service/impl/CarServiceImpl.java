@@ -46,8 +46,8 @@ public class CarServiceImpl implements CarService {
     @Transactional
     public CarDto updateCarInfoById(Long carId, UpdateCarInfoRequestDto requestDto) {
         Car car = findCarById(carId);
-        Car updatedCat = carMapper.updateCarInfo(car, requestDto);
-        Car savedCar = carRepository.save(updatedCat);
+        Car updatedCar = carMapper.updateCarInfo(car, requestDto);
+        Car savedCar = carRepository.save(updatedCar);
         return carMapper.entityToCarDto(savedCar);
     }
 

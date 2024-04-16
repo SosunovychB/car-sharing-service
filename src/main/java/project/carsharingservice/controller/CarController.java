@@ -25,7 +25,7 @@ import project.carsharingservice.service.CarService;
 
 @Tag(name = "Car management", description = "Endpoints for managing cars")
 @RestController
-@RequestMapping("/car")
+@RequestMapping("/cars")
 @RequiredArgsConstructor
 public class CarController {
     private final CarService carService;

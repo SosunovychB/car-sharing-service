@@ -39,7 +39,7 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers(
                                         "/auth/**",
-                                        "/car/**",
+                                        "/cars/**",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/error"

@@ -17,7 +17,11 @@ import project.carsharingservice.model.User;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Sql(scripts = {"classpath:database/users/add-users-to-the-users-table.sql",
+@Sql(scripts = {"classpath:database/payments/delete-payments-from-the-payments-table.sql",
+        "classpath:database/rentals/delete-rentals-from-the-rentals-table.sql",
+        "classpath:database/cars/delete-cars-from-the-cars-table.sql",
+        "classpath:database/users/delete-users-from-the-users-table.sql",
+        "classpath:database/users/add-users-to-the-users-table.sql",
         "classpath:database/cars/add-cars-to-the-cars-table.sql",
         "classpath:database/rentals/add-rentals-to-the-rentals-table.sql",
         "classpath:database/payments/add-payments-to-the-payments-table.sql"},

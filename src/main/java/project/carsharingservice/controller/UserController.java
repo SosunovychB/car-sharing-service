@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -30,22 +32,27 @@ import project.carsharingservice.service.UserService;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final UserDetailsService userDetailsService;
 
     @GetMapping("/me")
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "Get user info about yourself",
             description = "Get user info about yourself")
     public GetUserInfoResponseDto getUserInfo(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(authentication.getName());
+        User user = (User) userDetails;
         return userService.getUserInfo(user.getEmail());
     }
 
     @PutMapping("/me")
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "Update user info about yourself",
             description = "Update user info about yourself")
     public GetUserInfoResponseDto updateUserInfo(
             Authentication authentication,
             @RequestBody UpdateUserInfoRequestDto requestDto) {
-        User user = (User) authentication.getPrincipal();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(authentication.getName());
+        User user = (User) userDetails;
         return userService.updateUserInfo(user.getEmail(), requestDto);
     }
 

@@ -8,6 +8,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +30,7 @@ import project.carsharingservice.service.RentalService;
 @RequiredArgsConstructor
 public class RentalController {
     private final RentalService rentalService;
+    private final UserDetailsService userDetailsService;
 
     @GetMapping
     @Operation(summary = "Get rentals by user id",
@@ -36,7 +39,8 @@ public class RentalController {
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Boolean isActive,
             Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(authentication.getName());
+        User user = (User) userDetails;
         return rentalService.getRentalsByUserId(userId, isActive, user);
     }
 
@@ -45,7 +49,8 @@ public class RentalController {
             description = "Get a rental by id")
     public RentalDto getRentalById(@PathVariable Long rentalId,
                                    Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(authentication.getName());
+        User user = (User) userDetails;
         return rentalService.getRentalById(rentalId, user);
     }
 
@@ -55,7 +60,8 @@ public class RentalController {
             description = "Create a new rental")
     public RentalDto createRental(@RequestBody @Valid CreateRentalRequestDto requestDto,
             Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(authentication.getName());
+        User user = (User) userDetails;
         return rentalService.createRental(requestDto, user);
     }
 
@@ -65,7 +71,8 @@ public class RentalController {
             description = "Set an actual return date for a rental")
     public RentalDto setActualReturnDate(@PathVariable Long rentalId,
                                    Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(authentication.getName());
+        User user = (User) userDetails;
         return rentalService.setActualReturnDate(rentalId, user.getId());
     }
 }

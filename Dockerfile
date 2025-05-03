@@ -1,16 +1,28 @@
-# Builder stage
-FROM openjdk:17-jdk-slim as builder
-WORKDIR application
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} application.jar
-RUN java -Djarmode=layertools -jar application.jar extract
+# ----------------------
+# 1. Maven build stage
+# ----------------------
+FROM maven:3.9.6-eclipse-temurin-17 AS maven_builder
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Final stage
+# ----------------------
+# 2. Layer extraction stage
+# ----------------------
+FROM openjdk:17-jdk-slim AS layer_extractor
+WORKDIR /layers
+COPY --from=maven_builder /app/target/*.jar app.jar
+RUN java -Djarmode=layertools -jar app.jar extract
+
+# ----------------------
+# 3. Final runtime stage
+# ----------------------
 FROM openjdk:17-jdk-slim
-WORKDIR application
-COPY --from=builder application/dependencies/ ./
-COPY --from=builder application/spring-boot-loader/ ./
-COPY --from=builder application/snapshot-dependencies/ ./
-COPY --from=builder application/application/ ./
-ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+WORKDIR /app
+COPY --from=layer_extractor /layers/dependencies/ ./
+COPY --from=layer_extractor /layers/spring-boot-loader/ ./
+COPY --from=layer_extractor /layers/snapshot-dependencies/ ./
+COPY --from=layer_extractor /layers/application/ ./
+
 EXPOSE 8080
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

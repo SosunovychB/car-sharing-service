@@ -24,6 +24,13 @@ This is the back-end part of the application, developed in Java.
 - Telegram bot (telegrambots - version 6.8.0)
 - Stripe payment service (stripe-java - version 20.97.0)
 
+### HOW TO START THE APP
+1. Copy the app to your IDE.
+2. Create .env file in the root directory and set variables as on the picture.
+![env file.png](env%20file.png)
+3. Run command "docker-compose up" in Terminal (you need to install and start Docker for it).
+4. Study the app using Swagger via link http://localhost:8081/swagger-ui/index.html.
+
 ### ARCHITECTURE
 
 ![architecture.png](architecture.png)
@@ -118,7 +125,7 @@ This is the back-end part of the application, developed in Java.
 10. Stripe payment service and Telegram bot service were used for cashless payment and notification of managers.
 11. All endpoints were documented using Swagger.
 12. Liquibase was used as a database schema change management solution.
-- The default user is "admin@example.com" with the password "Password1234$" and the role MANAGER.
+- The default user is "admin@example.com" with the password "Admin1234$" and the role MANAGER.
 - All users registered through the common available endpoint POST: /auth/registration will have the default role USER.
 13. Tests were written using Testcontainers for repository-level, Mockito for service-level, and MockMvc for controller-level.
-14. Finally, Docker was integrated for easy application deployment (for access to private information such as JWT_SECRET and BOT_TOKEN, please contact me at bohdan.sosunovych@gmail.com).
+14. Finally, Docker was integrated for easy application deployment.

@@ -17,16 +17,18 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
-  app:
+
+  backend:
     depends_on:
-      - mysqldb
+      mysqldb:
+        condition: service_healthy
     restart: on-failure
-    image: car-sharing-service
+    image: car-sharing-service:1.0.0
     build: .
     env_file: ./.env
     ports:
       - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
-      - $DEBUG_PORT:$DEBUG_PORT
+      - 127.0.0.1:$DEBUG_PORT:$DEBUG_PORT
     environment:
       SPRING_APPLICATION_JSON: '{
         "spring.datasource.url" : "jdbc:mysql://mysqldb:$MYSQL_DOCKER_PORT/$MYSQL_DATABASE",
